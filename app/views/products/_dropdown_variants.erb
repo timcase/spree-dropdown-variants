@@ -1,0 +1,34 @@
+  <% if product_price(@product) %>
+    <% hook :product_price do %>
+      <p class="prices">
+        <%= t("price") %>
+        <br />
+        <span class="price selling"><%= product_price(@product) %></span>
+      </p>
+    <% end %>
+  <% end %>
+
+  <% if @product.has_variants? %>
+    <div id="product-variants">
+      <h2><%= t('variants') %></h2>
+      <%= hidden_field_tag 'product', @product.id %>
+      <ul>
+        <%  @product.option_types.each do |option_type| %>
+            <li>
+              <%= option_type.presentation %><br/>
+              <%= select_tag "option_types[#{option_type.id}]", options_from_collection_for_select(instock_option_values(@product, option_type), :id, :presentation) %>
+            </li>
+        <% end%>
+      </ul>
+    </div>
+  <% end%>
+  <% if @product.has_stock? || Spree::Config[:allow_backorders] %>
+    <%= text_field_tag (@product.has_variants? ? :quantity : "variants[#{@product.master.id}]"),
+      1, :class => "title", :size => 3 %>
+    &nbsp;
+    <button type='submit' class='large primary'>
+      <%= image_tag('/images/add-to-cart.png') + t('add_to_cart') %>
+    </button>
+  <% else %>
+    <%= content_tag('strong', t('out_of_stock')) %>
+  <% end %>
