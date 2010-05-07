@@ -3,6 +3,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe OrdersController do
   
   before(:each) do
+    Spree::Config.set(:allow_back_orders => false)
     @product = Factory(:product)
     create_in_stock_variant
     @size_option_type = Factory(:option_type)

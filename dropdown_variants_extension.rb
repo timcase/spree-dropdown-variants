@@ -7,16 +7,10 @@ class DropdownVariantsExtension < Spree::Extension
                instead of the default radio buttons."
   url "http://github.com/timcase/Spree-Dropdown-Variants"
 
-  # Please use dropdown_variants/config/routes.rb instead for extension routes.
-
-  # def self.require_gems(config)
-  #   config.gem "gemname-goes-here", :version => '1.2.3'
-  # end
-
   def activate
     ProductsHelper.module_eval do
       def instock_option_values(product, option_type)
-        instock = product.variants.find_all{|variant| variant.in_stock?}
+        instock = product.variants.find_all{|variant| variant.in_stock? || Spree::Config[:show_zero_stock_products]}
         uniq_option_values = instock.collect(&:option_values).flatten.uniq
         uniq_option_values.find_all{|ov| ov.option_type == option_type}
       end
@@ -62,7 +56,7 @@ class DropdownVariantsExtension < Spree::Extension
       end
       
       def add_variant(variant, quantity = 1)
-        @variant_errors = I18n.t('variant_out_of_stock') if variant.nil? || !variant.in_stock?
+        @variant_errors = I18n.t('variant_out_of_stock') if variant.nil? || (!variant.in_stock? || !Spree::Config[:allow_backorders])
         self.add_variant_original(variant, quantity)
       end
     end
