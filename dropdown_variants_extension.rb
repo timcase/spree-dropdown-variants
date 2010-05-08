@@ -2,7 +2,7 @@
 # require_dependency 'application'
 
 class DropdownVariantsExtension < Spree::Extension
-  version "19.0"
+  version "0.1.0"
   description "Dropdown Variants displays variants on the product base in HTML select tags
                instead of the default radio buttons."
   url "http://github.com/timcase/Spree-Dropdown-Variants"
@@ -35,8 +35,6 @@ class DropdownVariantsExtension < Spree::Extension
     
     OrdersController.class_eval do
       create.before << :add_variants_from_drop_downs
-      
-      create.failure.wants.html { render :template => "products/show" }
 
       def add_variants_from_drop_downs
         if params[:option_types] and params[:product]
@@ -56,8 +54,11 @@ class DropdownVariantsExtension < Spree::Extension
       end
       
       def add_variant(variant, quantity = 1)
-        @variant_errors = I18n.t('variant_out_of_stock') if variant.nil? || (!variant.in_stock? || !Spree::Config[:allow_backorders])
-        self.add_variant_original(variant, quantity)
+        if variant.nil? || (!variant.in_stock? && !Spree::Config[:allow_backorders])
+          @variant_errors = I18n.t('variant_out_of_stock') 
+        else
+          self.add_variant_original(variant, quantity)
+        end
       end
     end
   end

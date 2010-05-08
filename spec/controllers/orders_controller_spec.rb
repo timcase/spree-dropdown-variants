@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 describe OrdersController do
   
   before(:each) do
-    Spree::Config.set(:allow_back_orders => false)
+    Spree::Config.set(:allow_backorders => false)
     @product = Factory(:product)
     create_in_stock_variant
     @size_option_type = Factory(:option_type)
@@ -47,7 +47,7 @@ describe OrdersController do
   it 'should render the products show template' do
     create_out_of_stock_variant
     do_create
-    response.should render_template('products/show')
+    response.should render_template('orders/edit')
   end
 
 end
